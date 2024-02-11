@@ -11,7 +11,6 @@ function OnEntry() {
     "Oct 2024",
     "Urgent"
   );
-  DomManip.GenerateDomStructure();
   DomManip.GenerateOnEntry(defaultProj);
 }
 
