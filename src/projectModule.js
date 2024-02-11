@@ -1,9 +1,10 @@
 export class Project {
-  constructor(name, description, dueDate, priority) {
+  constructor(name, description, dueDate, priority, tasks) {
     this.name = name;
     this.description = description;
     this.dueDate = dueDate;
     this.priority = priority;
+    this.tasks = tasks;
   }
 
   displayDetails() {
@@ -29,6 +30,10 @@ export class Project {
     return this.priority;
   }
 
+  get projectTasks() {
+    return this.tasks;
+  }
+
   // Setter methods
   set projectName(newName) {
     this.name = newName;
@@ -44,5 +49,9 @@ export class Project {
 
   set projectPrio(newPrio) {
     this.priority = newPrio;
+  }
+
+  set projectTasks(newTasks) {
+    this.tasks = newTasks;
   }
 }

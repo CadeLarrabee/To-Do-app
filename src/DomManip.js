@@ -40,7 +40,7 @@ export class DomController {
     const navDefProj = document.createElement("div");
     navDefProj.textContent = defaultProj.projectName;
     navDefProj.classList.add(defaultProj.projectPrio);
-    navDefProj.classList.add("projectName", "navItem");
+    navDefProj.classList.add("projName", "navItem");
     navProjectPanelWrapper.appendChild(navDefProj);
 
     const navOptionsWrapper = document.createElement("div");
@@ -82,6 +82,29 @@ export class DomController {
 
     mainWrapper.appendChild(navPanelWrapper);
   }
+
+  GenerateBodyPanel(mainWrapper, defaultProj) {}
+
+  GenerateProjectPanel(Wrapper, Project) {
+    const projWrapper = document.createElement("div");
+    projWrapper.classList.add(Project.projectPrio, "projWrapper");
+
+    const projName = document.createElement("div");
+    projName.textContent = Project.projectName;
+    projName.classList.add("projName", "projItem");
+    projWrapper.appendChild(projName);
+
+    const projDate = document.createElement("div");
+    projDate.textContent = Project.projectDue;
+    projDate.classList.add("projDate", "projItem");
+    projWrapper.appendChild(projDate);
+
+    Project.projectTasks.forEach((element) => {});
+
+    Wrapper.appendChild(projWrapper);
+  }
+
+  GenerateTaskPanel(Wrapper, task) {}
 
   GenerateOnEntry(defaultProj) {
     this.GenerateDomStructure(defaultProj);
