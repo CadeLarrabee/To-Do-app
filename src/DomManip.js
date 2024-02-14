@@ -1,4 +1,4 @@
-import { format, addDays } from "date-fns";
+import { format } from "date-fns";
 //
 //Controls the dom for the project
 //
@@ -10,7 +10,9 @@ export class DomController {
     const mainProjPanelWrapper = document.createElement("div");
     mainProjPanelWrapper.classList.add("mainWrapper");
     document.body.appendChild(mainProjPanelWrapper);
+
     this.GenerateNavPanel(mainProjPanelWrapper, defaultProj);
+    this.GenerateBodyPanel(mainProjPanelWrapper, defaultProj);
   }
 
   GenerateNavPanel(mainWrapper, defaultProj) {
@@ -83,7 +85,9 @@ export class DomController {
     mainWrapper.appendChild(navPanelWrapper);
   }
 
-  GenerateBodyPanel(mainWrapper, defaultProj) {}
+  GenerateBodyPanel(mainWrapper, defaultProj) {
+    this.GenerateProjectPanel(mainWrapper, defaultProj);
+  }
 
   GenerateProjectPanel(Wrapper, Project) {
     const projWrapper = document.createElement("div");
@@ -99,7 +103,23 @@ export class DomController {
     projDate.classList.add("projDate", "projItem");
     projWrapper.appendChild(projDate);
 
-    Project.projectTasks.forEach((element) => {});
+    Project.projectTasks.forEach((element) => {
+      const taskWrapper = document.createElement("div");
+      taskWrapper.classList.add(element.taskPrio, "taskWrapper");
+
+      const taskName = document.createElement("div");
+      taskName.textContent = element.taskName;
+      taskName.classList.add("taskName", "taskItem");
+      taskWrapper.appendChild(taskName);
+
+      const taskDate = document.createElement("div");
+      taskDate.textContent = element.taskDue.toLocaleString();
+      taskDate.classList.add("taskDate", "taskItem");
+
+      taskWrapper.appendChild(taskDate);
+
+      projWrapper.appendChild(taskWrapper);
+    });
 
     Wrapper.appendChild(projWrapper);
   }

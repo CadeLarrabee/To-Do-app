@@ -1,10 +1,10 @@
-class Task {
+import { format, addDays, parse } from "date-fns";
+export class Task {
   constructor(name, description, dueDate, priority, project) {
     this.name = name;
     this.description = description;
-    this.dueDate = dueDate;
+    this.dueDate = parse(dueDate, "MM/dd/yyyy", new Date());
     this.priority = priority;
-    this.project = project;
   }
   displayDetails() {
     console.log(`Name: ${this.name}`);
@@ -26,25 +26,25 @@ class Task {
   get taskPrio() {
     return this.priority;
   }
-  get taskProj() {
-    return this.project;
-  }
+  // get taskProj() {
+  //   return this.project;
+  // }
   //
   //Setters
   //
-  set projectName(newName) {
+  set taskName(newName) {
     this.name = newName;
   }
-  set projectDesc(newDesc) {
+  set taskDesc(newDesc) {
     this.description = newDesc;
   }
-  set projectDue(newDate) {
-    this.dueDate = newDate;
+  set taskDue(newDate) {
+    this.dueDate = parse(newDate, "MMMM dd, yyyy", new Date());
   }
   set taskPrio(newPrio) {
     this.priority = newPrio;
   }
-  set taskProj(newProj) {
-    this.project = newProj;
-  }
+  // set taskProj(newProj) {
+  //   this.project = newProj;
+  // }
 }

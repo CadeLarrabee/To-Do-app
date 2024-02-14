@@ -1,8 +1,9 @@
+import { format, addDays, parse } from "date-fns";
 export class Project {
   constructor(name, description, dueDate, priority, tasks) {
     this.name = name;
     this.description = description;
-    this.dueDate = dueDate;
+    this.dueDate = parse(dueDate, "MM/dd/yyyy", new Date());
     this.priority = priority;
     this.tasks = tasks;
   }
@@ -44,7 +45,7 @@ export class Project {
   }
 
   set projectDue(newDate) {
-    this.dueDate = newDate;
+    this.dueDate = parse(newDate, "MMMM dd, yyyy", new Date());
   }
 
   set projectPrio(newPrio) {
