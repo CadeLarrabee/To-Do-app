@@ -1,4 +1,6 @@
 import { format } from "date-fns";
+import { Task } from "./taskModule.js";
+import { Project } from "./projectModule.js";
 //
 //Controls the dom for the project
 //
@@ -34,9 +36,10 @@ export class DomController {
     const currentDate = new Date();
     const formattedDate = format(currentDate, "yyyy-MM-dd");
     navPanelMainDate.textContent = formattedDate;
-    navPanelWrapper.appendChild(navPanelMainDate);
+    navPanelMainTitle.appendChild(navPanelMainDate);
 
     const navProjectPanelWrapper = document.createElement("div");
+    navProjectPanelWrapper.classList.add("NavProjPanelWrapper");
     navPanelWrapper.appendChild(navProjectPanelWrapper);
 
     const navDefProj = document.createElement("div");
@@ -85,13 +88,41 @@ export class DomController {
     mainWrapper.appendChild(navPanelWrapper);
   }
 
+  AddNewNavPanelProj(project) {
+    //This eventually should allow you to open specific projects onclick.
+    const navDefProj = document.createElement("div");
+    navDefProj.textContent = project.projectName;
+    navDefProj.classList.add(
+      "navItem",
+      project.projectName,
+      project.projectPrio
+    );
+
+    navProjectPanelWrapper = document.querySelector(".NavProjPanelWrapper");
+
+    navProjectPanelWrapper.appendChild(navDefProj);
+  }
+
+  DeleteNavPanelProj(project) {
+    navProjectToDelete = document.querySelector(
+      `.${project.projectName}.${navItem}`
+    );
+    navProjectToDelete.parentNode.removeChild(navProjectToDelete);
+  }
+
   GenerateBodyPanel(mainWrapper, defaultProj) {
     this.GenerateProjectPanel(mainWrapper, defaultProj);
+    const AddNewProjWrapper = document.createElement("div");
+    this.GenerateAddButton(AddNewProjWrapper);
+    mainWrapper.appendChild(AddNewProjWrapper);
   }
 
   GenerateProjectPanel(Wrapper, Project) {
     const projWrapper = document.createElement("div");
     projWrapper.classList.add(Project.projectPrio, "projWrapper");
+    projWrapper.setAttribute("data-project-name", Project.projectName);
+    Project.DomElement = projWrapper;
+    // Add data attribute to identify the project
 
     const projName = document.createElement("div");
     projName.textContent = Project.projectName;
@@ -103,18 +134,28 @@ export class DomController {
     projDate.classList.add("projDate", "projItem");
     projWrapper.appendChild(projDate);
 
+    this.GenerateAddButton(projWrapper, Project);
     this.GenerateDeleteButton(projWrapper);
 
-    Project.projectTasks.forEach((element) => {
-      const taskWrapper = document.createElement("div");
-      this.GenerateTaskPanel(taskWrapper, element);
+    if (!Project.projectTasks) {
+    } else {
+      Project.projectTasks.forEach((element) => {
+        const taskWrapper = document.createElement("div");
+        this.GenerateTaskPanel(taskWrapper, element);
 
-      projWrapper.appendChild(taskWrapper);
-    });
-
-    this.GenerateAddButton(projWrapper);
+        projWrapper.appendChild(taskWrapper);
+      });
+    }
 
     Wrapper.appendChild(projWrapper);
+  }
+
+  extractProjectInfo(projectWrapper) {
+    // Retrieve project name from the data attribute
+    const projectName = projectWrapper.getAttribute("data-project-name");
+
+    // Find the Project instance associated with the project name
+    return projects.find((project) => project.name === projectName);
   }
 
   GenerateTaskPanel(Wrapper, task) {
@@ -137,6 +178,33 @@ export class DomController {
     Wrapper.appendChild(taskDate);
   }
 
+  //is it possible to not have to import the task file to
+  //make new tasks here? Should taskModule.js handle this?
+  //but then it would have to import the dom module too, right?
+  AddNewTask(name, description, dueDate, priority, project) {
+    // Create a new Task object
+    const newTask = new Task(name, description, dueDate, priority, project);
+
+    // Generate a new task panel for the new task
+    const taskWrapper = document.createElement("div");
+    this.GenerateTaskPanel(taskWrapper, newTask);
+
+    // Append the task panel to the appropriate location in the DOM
+    project.tasks.push(newTask);
+    const projectWrapper = document.querySelector(
+      `[data-project-name="${project.name}"]`
+    );
+    projectWrapper.appendChild(taskWrapper);
+  }
+
+  AddNewProject(name, description, dueDate, priority) {
+    // Create a new proj object
+    const newProject = new Project(name, description, dueDate, priority);
+    const mainWrapper = document.querySelector(".mainWrapper");
+
+    this.GenerateProjectPanel(mainWrapper, newProject);
+  }
+
   GenerateDeleteButton(wrapper) {
     const Delete = document.createElement("button");
     Delete.classList.add("deleteBtn");
@@ -147,12 +215,12 @@ export class DomController {
     wrapper.appendChild(Delete);
   }
 
-  GenerateAddButton(wrapper) {
+  GenerateAddButton(wrapper, project) {
     const Add = document.createElement("button");
     Add.classList.add("addBtn");
     Add.textContent = " + ";
 
-    Add.addEventListener("click", () => this.GenerateAddForm(wrapper));
+    Add.addEventListener("click", () => this.GenerateAddForm(wrapper, project));
 
     wrapper.appendChild(Add);
   }
@@ -167,7 +235,7 @@ export class DomController {
 
   //Generate a form that allows you to add a new project, or task
   //should have a submit button at the bottom, and a close button.
-  GenerateAddForm(wrapper) {
+  GenerateAddForm(wrapper, project) {
     const formWrapper = document.createElement("div");
 
     const headerWrapper = document.createElement("div");
@@ -211,7 +279,7 @@ export class DomController {
     form.appendChild(submitButton);
 
     form.addEventListener("submit", (event) => {
-      event.preventDefault(); // Prevent default form submission behavior
+      event.preventDefault();
 
       // Retrieve input values
       const name = inputName.value;
@@ -220,6 +288,11 @@ export class DomController {
       const priority = inputPrio.value;
 
       this.RemovePanel(formWrapper);
+      if (!project) {
+        this.AddNewProject(name, description, date, priority);
+      } else {
+        this.AddNewTask(name, description, date, priority, project);
+      }
     });
 
     formWrapper.appendChild(form);

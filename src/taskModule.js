@@ -1,10 +1,12 @@
-import { format, addDays, parse } from "date-fns";
+import { parse } from "date-fns";
 export class Task {
   constructor(name, description, dueDate, priority, project) {
     this.name = name;
     this.description = description;
     this.dueDate = parse(dueDate, "MM/dd/yyyy", new Date());
     this.priority = priority;
+    this.project = project;
+    this.domElement = null;
   }
   displayDetails() {
     console.log(`Name: ${this.name}`);

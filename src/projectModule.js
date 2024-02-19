@@ -1,11 +1,12 @@
-import { format, addDays, parse } from "date-fns";
+import { parse } from "date-fns";
 export class Project {
   constructor(name, description, dueDate, priority, tasks) {
     this.name = name;
     this.description = description;
     this.dueDate = parse(dueDate, "MM/dd/yyyy", new Date());
     this.priority = priority;
-    this.tasks = tasks;
+    this.tasks = tasks ? tasks : [];
+    this.domElement = null;
   }
 
   displayDetails() {
@@ -35,6 +36,10 @@ export class Project {
     return this.tasks;
   }
 
+  get DomElement() {
+    return this.domElement;
+  }
+
   // Setter methods
   set projectName(newName) {
     this.name = newName;
@@ -54,5 +59,9 @@ export class Project {
 
   set projectTasks(newTasks) {
     this.tasks = newTasks;
+  }
+
+  set DomElement(element) {
+    this.domElement = element;
   }
 }

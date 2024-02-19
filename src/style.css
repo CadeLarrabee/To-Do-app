@@ -10,3 +10,14 @@ form {
   width: 400px;
   height: 400px;
 }
+.mainWrapper {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+}
+.navWrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  gap: 6px;
+}
