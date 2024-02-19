@@ -16,7 +16,7 @@ function OnEntry() {
   const defaultProj = new Project(
     "Javascript Development",
     "Learning web development one step at a time!",
-    "02/11/2014",
+    "2014-02-11",
     "Urgent",
     defTasks
   );

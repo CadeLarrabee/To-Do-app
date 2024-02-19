@@ -3,7 +3,7 @@ export class Project {
   constructor(name, description, dueDate, priority, tasks) {
     this.name = name;
     this.description = description;
-    this.dueDate = parse(dueDate, "MM/dd/yyyy", new Date());
+    this.dueDate = parse(dueDate, "yyyy-MM-dd", new Date());
     this.priority = priority;
     this.tasks = tasks ? tasks : [];
     this.domElement = null;
@@ -50,7 +50,7 @@ export class Project {
   }
 
   set projectDue(newDate) {
-    this.dueDate = parse(newDate, "MMMM dd, yyyy", new Date());
+    this.dueDate = parse(newDate, "yyyy-MM-dd", new Date());
   }
 
   set projectPrio(newPrio) {

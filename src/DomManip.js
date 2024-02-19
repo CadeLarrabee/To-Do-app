@@ -111,7 +111,6 @@ export class DomController {
   }
 
   GenerateBodyPanel(mainWrapper, defaultProj) {
-    this.GenerateProjectPanel(mainWrapper, defaultProj);
     const AddNewProjWrapper = document.createElement("div");
     this.GenerateAddButton(AddNewProjWrapper);
     mainWrapper.appendChild(AddNewProjWrapper);
@@ -264,14 +263,19 @@ export class DomController {
     form.appendChild(inputDesc);
 
     const inputDate = document.createElement("input");
-    inputDate.setAttribute("type", "text");
+    inputDate.setAttribute("type", "date");
     inputDate.setAttribute("name", "dateInput");
     form.appendChild(inputDate);
 
-    const inputPrio = document.createElement("input");
-    inputPrio.setAttribute("type", "text");
-    inputPrio.setAttribute("prio", "textInput");
-    inputPrio.setAttribute("placeholder", "Enter priority");
+    const inputPrio = document.createElement("select");
+    inputPrio.name = "priority";
+    const options = ["Critical", "Urgent", "Routine"];
+
+    options.forEach((optionText) => {
+      const optionElement = document.createElement("option");
+      optionElement.textContent = optionText;
+      inputPrio.appendChild(optionElement);
+    });
     form.appendChild(inputPrio);
 
     const submitButton = document.createElement("button");
