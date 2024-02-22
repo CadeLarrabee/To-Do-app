@@ -28,9 +28,9 @@ export class Task {
   get taskPrio() {
     return this.priority;
   }
-  // get taskProj() {
-  //   return this.project;
-  // }
+  get taskProj() {
+    return this.project;
+  }
   //
   //Setters
   //
@@ -46,7 +46,7 @@ export class Task {
   set taskPrio(newPrio) {
     this.priority = newPrio;
   }
-  // set taskProj(newProj) {
-  //   this.project = newProj;
-  // }
+  set taskProj(newProj) {
+    this.project = newProj;
+  }
 }

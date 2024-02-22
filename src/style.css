@@ -1,10 +1,23 @@
+:root {
+  --primary-color: #1f0c34;
+  --secondary-color: #10021e;
+  --critical-color: #642723;
+  --urgent-color: #6b5426;
+  --routine-color: #264b24;
+  --text-color: #fcf6ee;
+  --nav-text-color: #dfa553;
+}
 * {
   padding: 0px;
   margin: 0px;
 }
+.body {
+  background-color: black;
+}
 button {
-  width: 50px;
-  height: 50px;
+  width: 70px;
+  height: 30px;
+  border-radius: 8px;
 }
 form {
   width: 400px;
@@ -20,4 +33,70 @@ form {
   flex-direction: column;
   justify-content: space-around;
   gap: 6px;
+  width: 15%;
+  background-color: var(--secondary-color);
+  color: var(--nav-text-color);
+}
+.projBodyWrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 85%;
+  border-radius: 8px;
+  border-color: black;
+  background-color: var(--primary-color);
+}
+.taskWrapper,
+.projWrapper {
+  display: flex;
+  gap: 6px;
+  color: var(--text-color);
+}
+.projWrapper {
+  flex-direction: column;
+  height: 250px;
+  width: 100%;
+  justify-content: space-between;
+}
+.projItem {
+  font-size: 24px;
+}
+.taskWrapper {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  height: 100px;
+  width: 100%;
+  border-radius: 12px;
+  background-color: lightslategray;
+  position: relative;
+}
+.taskName {
+}
+
+.taskItem {
+  width: 100px;
+  height: 25px;
+}
+.taskDesc {
+  width: 50%;
+}
+.taskDue {
+  width: 15%;
+}
+.taskCircle {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  margin-left: 16px;
+}
+
+.Critical {
+  background-color: var(--critical-color);
+}
+.Urgent {
+  background-color: var(--urgent-color);
+}
+.Routine {
+  background-color: var(--routine-color);
 }

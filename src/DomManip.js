@@ -13,17 +13,19 @@ export class DomController {
     mainProjPanelWrapper.classList.add("mainWrapper");
     document.body.appendChild(mainProjPanelWrapper);
 
-    this.GenerateNavPanel(mainProjPanelWrapper, defaultProj);
-    this.GenerateBodyPanel(mainProjPanelWrapper, defaultProj);
+    this.GenerateNavPanel(mainProjPanelWrapper);
+    this.GenerateBodyPanel(mainProjPanelWrapper);
   }
 
-  GenerateNavPanel(mainWrapper, defaultProj) {
+  GenerateNavPanel(mainWrapper) {
     //
     // Handle the generation of the nav panel and all its components.
     //
     const navPanelWrapper = document.createElement("div");
     navPanelWrapper.classList.add("nav");
     navPanelWrapper.classList.add("navWrapper");
+
+    //Title and time panel
 
     const navPanelMainTitle = document.createElement("div");
     navPanelMainTitle.classList.add("navTitle", "navItem");
@@ -38,15 +40,19 @@ export class DomController {
     navPanelMainDate.textContent = formattedDate;
     navPanelMainTitle.appendChild(navPanelMainDate);
 
+    //Project panels
+
     const navProjectPanelWrapper = document.createElement("div");
     navProjectPanelWrapper.classList.add("NavProjPanelWrapper");
     navPanelWrapper.appendChild(navProjectPanelWrapper);
 
-    const navDefProj = document.createElement("div");
-    navDefProj.textContent = defaultProj.projectName;
-    navDefProj.classList.add(defaultProj.projectPrio);
-    navDefProj.classList.add("projName", "navItem");
-    navProjectPanelWrapper.appendChild(navDefProj);
+    // const navDefProj = document.createElement("div");
+    // navDefProj.textContent = defaultProj.projectName;
+    // navDefProj.classList.add(defaultProj.projectPrio);
+    // navDefProj.classList.add("projName", "navItem");
+    // navProjectPanelWrapper.appendChild(navDefProj);
+
+    //Options panel > includes help and settings
 
     const navOptionsWrapper = document.createElement("div");
     navOptionsWrapper.classList.add("optionsWrapper");
@@ -81,7 +87,7 @@ export class DomController {
     navHelpIcon.classList.add("navIcon");
     navHelpWrapper.appendChild(navHelpIcon);
 
-    navPanelWrapper.appendChild(navHelpWrapper);
+    navOptionsWrapper.appendChild(navHelpWrapper);
 
     navPanelWrapper.appendChild(navOptionsWrapper);
 
@@ -91,6 +97,9 @@ export class DomController {
   AddNewNavPanelProj(project) {
     //This eventually should allow you to open specific projects onclick.
     const navDefProj = document.createElement("div");
+    const navProjectPanelWrapper = document.querySelector(
+      ".NavProjPanelWrapper"
+    );
     navDefProj.textContent = project.projectName;
     navDefProj.classList.add(
       "navItem",
@@ -98,22 +107,26 @@ export class DomController {
       project.projectPrio
     );
 
-    navProjectPanelWrapper = document.querySelector(".NavProjPanelWrapper");
-
     navProjectPanelWrapper.appendChild(navDefProj);
   }
 
-  DeleteNavPanelProj(project) {
-    navProjectToDelete = document.querySelector(
-      `.${project.projectName}.${navItem}`
+  DeleteNavPanelProj(projectName) {
+    // const navProjectPanelWrapper = document.querySelector(
+    //   ".NavProjPanelWrapper"
+    // );
+    const navProjectToDelete = document.querySelector(
+      `.${projectName}.navItem`
     );
-    navProjectToDelete.parentNode.removeChild(navProjectToDelete);
+    if (navProjectToDelete) {
+      navProjectToDelete.parentNode.removeChild(navProjectToDelete);
+    }
   }
 
-  GenerateBodyPanel(mainWrapper, defaultProj) {
+  GenerateBodyPanel(mainWrapper) {
     const AddNewProjWrapper = document.createElement("div");
-    this.GenerateAddButton(AddNewProjWrapper);
+    AddNewProjWrapper.classList.add("projBodyWrapper");
     mainWrapper.appendChild(AddNewProjWrapper);
+    this.GenerateAddButton(AddNewProjWrapper);
   }
 
   GenerateProjectPanel(Wrapper, Project) {
@@ -129,14 +142,24 @@ export class DomController {
     projWrapper.appendChild(projName);
 
     const projDate = document.createElement("div");
-    projDate.textContent = Project.projectDue;
+    projDate.textContent =
+      "Due Date: " + Project.projectDue.toLocaleDateString();
     projDate.classList.add("projDate", "projItem");
     projWrapper.appendChild(projDate);
 
-    this.GenerateAddButton(projWrapper, Project);
-    this.GenerateDeleteButton(projWrapper);
+    const projectDesc = document.createElement("div");
+    projectDesc.textContent = Project.projectDesc;
+    projectDesc.classList.add("projDesc", "projItem");
+    projWrapper.appendChild(projectDesc);
 
-    if (!Project.projectTasks) {
+    const projButtonWrapper = document.createElement("div");
+
+    this.GenerateAddButton(projButtonWrapper, Project);
+    this.GenerateDeleteButton(projButtonWrapper);
+
+    projWrapper.appendChild(projButtonWrapper);
+
+    if (Project.projectTasks.length === 0) {
     } else {
       Project.projectTasks.forEach((element) => {
         const taskWrapper = document.createElement("div");
@@ -144,9 +167,21 @@ export class DomController {
 
         projWrapper.appendChild(taskWrapper);
       });
+      projWrapper.classList.add("hasTasks");
     }
+    this.ModifyTaskHeight(projWrapper, Project);
+    this.AddNewNavPanelProj(Project);
 
     Wrapper.appendChild(projWrapper);
+  }
+
+  ModifyTaskHeight(projWrapper, Project) {
+    const taskHeight = 100;
+    const numTasks = Project.projectTasks ? Project.projectTasks.length : 0;
+    const totalHeight = 100 + numTasks * taskHeight;
+
+    // Set the height of projWrapper
+    projWrapper.style.height = totalHeight + "px";
   }
 
   extractProjectInfo(projectWrapper) {
@@ -161,20 +196,29 @@ export class DomController {
     //
     //Given a task and a wrapper, generate a panel that handles info about the task.
     //
-    Wrapper.classList.add(task.taskPrio, "taskWrapper");
+    Wrapper.classList.add("taskWrapper");
+
+    this.GenerateDeleteButton(Wrapper, task.taskPrio);
+
+    // const taskCircle = document.createElement("div");
+    // taskCircle.classList.add("taskCircle", task.taskPrio, "taskItem");
 
     const taskName = document.createElement("div");
     taskName.textContent = task.taskName;
     taskName.classList.add("taskName", "taskItem");
-    Wrapper.appendChild(taskName);
 
     const taskDate = document.createElement("div");
-    taskDate.textContent = task.taskDue.toLocaleString();
+    taskDate.textContent = task.taskDue.toLocaleDateString();
     taskDate.classList.add("taskDate", "taskItem");
 
-    this.GenerateDeleteButton(Wrapper);
+    const taskDesc = document.createElement("div");
+    taskDesc.textContent = task.taskDesc;
+    taskDesc.classList.add("taskDesc", "taskItem");
 
+    //Wrapper.appendChild(taskCircle);
+    Wrapper.appendChild(taskName);
     Wrapper.appendChild(taskDate);
+    Wrapper.appendChild(taskDesc);
   }
 
   //is it possible to not have to import the task file to
@@ -190,26 +234,42 @@ export class DomController {
 
     // Append the task panel to the appropriate location in the DOM
     project.tasks.push(newTask);
-    const projectWrapper = document.querySelector(
+    const projWrapper = document.querySelector(
       `[data-project-name="${project.name}"]`
     );
-    projectWrapper.appendChild(taskWrapper);
+
+    //Check to see if we need to enlarge the project container
+    this.ModifyTaskHeight(projWrapper, project);
+
+    projWrapper.appendChild(taskWrapper);
+
+    //Check if we need to tag the projectWrapper to be enlarged
+    // const hasTasksClass = projWrapper.classList.contains("hasTasks");
+
+    // if (!hasTasksClass) {
+    //   projWrapper.classList.add("hasTasks");
+    // }
   }
 
   AddNewProject(name, description, dueDate, priority) {
     // Create a new proj object
     const newProject = new Project(name, description, dueDate, priority);
-    const mainWrapper = document.querySelector(".mainWrapper");
+    const mainWrapper = document.querySelector(".projBodyWrapper");
 
     this.GenerateProjectPanel(mainWrapper, newProject);
   }
 
-  GenerateDeleteButton(wrapper) {
+  GenerateDeleteButton(wrapper, taskPrio) {
     const Delete = document.createElement("button");
-    Delete.classList.add("deleteBtn");
-    Delete.textContent = " X ";
 
     Delete.addEventListener("click", () => this.RemovePanel(wrapper));
+
+    if (taskPrio) {
+      Delete.classList.add("taskCircle", taskPrio, "taskItem");
+    } else {
+      Delete.classList.add("deleteBtn");
+      Delete.textContent = " X ";
+    }
 
     wrapper.appendChild(Delete);
   }
@@ -226,6 +286,13 @@ export class DomController {
 
   // Remove a panel and all its children from the DOM
   RemovePanel(panel) {
+    if (!panel) return;
+
+    if (panel.classList.contains("projWrapper")) {
+      // Call the function to delete the corresponding navigation panel
+      this.DeleteNavPanelProj(panel.dataset.projectName);
+    }
+
     while (panel.firstChild) {
       panel.removeChild(panel.firstChild);
     }
