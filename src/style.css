@@ -1,15 +1,18 @@
 :root {
-  --primary-color: #1f0c34;
-  --secondary-color: #10021e;
-  --critical-color: #642723;
-  --urgent-color: #6b5426;
-  --routine-color: #264b24;
-  --text-color: #fcf6ee;
+  --primary-color: #ffffff;
+  --secondary-color: #451757;
+  --critical-color: #9e5651;
+  --urgent-color: #a78b54;
+  --routine-color: #4c7a4a;
+  --text-color: #000000;
   --nav-text-color: #dfa553;
+  --form-color: #dff3e4;
+  --deleteBtn-border: rgb(201, 97, 97);
 }
 * {
   padding: 0px;
   margin: 0px;
+  min-width: 0;
 }
 .body {
   background-color: black;
@@ -18,10 +21,23 @@ button {
   width: 70px;
   height: 30px;
   border-radius: 8px;
+  flex-shrink: 0;
+  border-width: 2px;
+  border-color: var(--nav-text-color);
 }
-form {
-  width: 400px;
-  height: 400px;
+.deleteBtn {
+  border-radius: 8px;
+  border-width: 2px;
+  width: 20px;
+  height: 20px;
+  border-color: var(--deleteBtn-border);
+  background-color: rgb(190, 81, 81);
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px,
+    rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+  position: absolute;
+  outline: inherit;
+  top: 8px;
+  right: 8px;
 }
 .mainWrapper {
   display: flex;
@@ -37,13 +53,14 @@ form {
   background-color: var(--secondary-color);
   color: var(--nav-text-color);
 }
+.NavProjPanelWrapper {
+  gap: 6px;
+}
 .projBodyWrapper {
   display: flex;
   flex-direction: column;
   height: 100vh;
   width: 85%;
-  border-radius: 8px;
-  border-color: black;
   background-color: var(--primary-color);
 }
 .taskWrapper,
@@ -54,7 +71,8 @@ form {
 }
 .projWrapper {
   flex-direction: column;
-  height: 250px;
+  position: relative;
+  min-height: 150px;
   width: 100%;
   justify-content: space-between;
 }
@@ -62,14 +80,14 @@ form {
   font-size: 24px;
 }
 .taskWrapper {
+  position: relative;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
   height: 100px;
-  width: 100%;
   border-radius: 12px;
   background-color: lightslategray;
-  position: relative;
+  margin-left: 16px;
 }
 .taskName {
 }
@@ -87,10 +105,75 @@ form {
 .taskCircle {
   width: 25px;
   height: 25px;
-  border-radius: 50%;
   margin-left: 16px;
+  border-radius: 50%;
 }
-
+.taskCheckMark {
+  height: 20px;
+  width: 20px;
+  opacity: 50%;
+}
+.taskCheckMark:hover {
+  opacity: 100%;
+}
+.formWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: var(--text-color);
+  width: 400px;
+  border-radius: 8px;
+  background-color: var(--form-color);
+  border-width: 2px;
+  border-color: var(--text-color);
+  border-style: solid;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 9999;
+  box-shadow: rgba(0, 0, 0, 0.89) 0px 5px 15px;
+}
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 12px;
+  border-radius: 0px;
+}
+.addFormName {
+  height: 50px;
+  font-size: 20px;
+  border-style: none;
+  background-color: var(--form-color);
+}
+.addFormDesc {
+  height: 40px;
+  font-size: 12px;
+  border-style: none;
+  display: inline-block;
+  background-color: var(--form-color);
+}
+.addFormDate {
+  border-radius: 4px;
+  height: 20px;
+  width: 150px;
+  border-style: solid;
+  border-width: 1px;
+  background-color: var(--form-color);
+}
+.addFormPrio {
+  border-radius: 4px;
+  height: 20px;
+  width: 150px;
+  border-style: solid;
+  border-width: 1px;
+  background-color: var(--form-color);
+}
+.dateFormWrapper {
+  display: flex;
+  gap: 8px;
+}
 .Critical {
   background-color: var(--critical-color);
 }

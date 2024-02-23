@@ -1,6 +1,7 @@
 import { parse } from "date-fns";
 export class Project {
-  constructor(name, description, dueDate, priority, tasks) {
+  constructor(id, name, description, dueDate, priority, tasks) {
+    this.id = id;
     this.name = name;
     this.description = description;
     this.dueDate = parse(dueDate, "yyyy-MM-dd", new Date());
@@ -16,6 +17,10 @@ export class Project {
   }
 
   // Getter methods
+  get projectId() {
+    return this.id;
+  }
+
   get projectName() {
     return this.name;
   }

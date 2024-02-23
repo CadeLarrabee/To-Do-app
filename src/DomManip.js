@@ -1,10 +1,15 @@
 import { format } from "date-fns";
 import { Task } from "./taskModule.js";
 import { Project } from "./projectModule.js";
+import Checkmark from "./images/Checkmark.png";
+import { StorageHandler } from "./localStorageHandler.js";
 //
 //Controls the dom for the project
 //
 export class DomController {
+  constructor() {
+    this.storageHandler = new StorageHandler();
+  }
   //
   //Handle the setup of the page pre-project injection
   //
@@ -15,6 +20,7 @@ export class DomController {
 
     this.GenerateNavPanel(mainProjPanelWrapper);
     this.GenerateBodyPanel(mainProjPanelWrapper);
+    //this.GenerateTodayPanel(mainProjPanelWrapper, projectLocal);
   }
 
   GenerateNavPanel(mainWrapper) {
@@ -32,6 +38,10 @@ export class DomController {
     navPanelMainTitle.textContent = "Today:";
     navPanelWrapper.appendChild(navPanelMainTitle);
 
+    navPanelMainTitle.addEventListener("click", () =>
+      this.GenerateTodayPanel(mainWrapper)
+    );
+
     const navPanelMainDate = document.createElement("div");
     navPanelMainDate.classList.add("navDate", "navItem");
 
@@ -42,15 +52,19 @@ export class DomController {
 
     //Project panels
 
+    const navNewProjectPanelWrapper = document.createElement("div");
+    navNewProjectPanelWrapper.classList.add("navNewProjectPanelWrapper");
+    navNewProjectPanelWrapper.textContent = "Add New Project";
+    //this.GenerateAddButton(navNewProjectPanelWrapper);
+    navNewProjectPanelWrapper.addEventListener("click", () =>
+      this.GenerateAddForm(mainWrapper)
+    );
+
+    navPanelWrapper.appendChild(navNewProjectPanelWrapper);
+
     const navProjectPanelWrapper = document.createElement("div");
     navProjectPanelWrapper.classList.add("NavProjPanelWrapper");
     navPanelWrapper.appendChild(navProjectPanelWrapper);
-
-    // const navDefProj = document.createElement("div");
-    // navDefProj.textContent = defaultProj.projectName;
-    // navDefProj.classList.add(defaultProj.projectPrio);
-    // navDefProj.classList.add("projName", "navItem");
-    // navProjectPanelWrapper.appendChild(navDefProj);
 
     //Options panel > includes help and settings
 
@@ -92,22 +106,46 @@ export class DomController {
     navPanelWrapper.appendChild(navOptionsWrapper);
 
     mainWrapper.appendChild(navPanelWrapper);
+
+    //Load the saved projects, and add them to the nav bar
+
+    this.LoadProjsToNavPanel();
+  }
+
+  LoadProjsToNavPanel() {
+    const loadedProjs = this.storageHandler.loadFromLocalStorage();
+    if (loadedProjs) {
+      loadedProjs.forEach((proj) => {
+        this.AddNewNavPanelProj(proj);
+      });
+    }
   }
 
   AddNewNavPanelProj(project) {
     //This eventually should allow you to open specific projects onclick.
-    const navDefProj = document.createElement("div");
     const navProjectPanelWrapper = document.querySelector(
       ".NavProjPanelWrapper"
     );
-    navDefProj.textContent = project.projectName;
-    navDefProj.classList.add(
-      "navItem",
-      project.projectName,
-      project.projectPrio
+    const ExistsInNav = navProjectPanelWrapper.querySelector(
+      ".proj" + project.projectId
     );
+    if (!ExistsInNav) {
+      const navDefProj = document.createElement("div");
 
-    navProjectPanelWrapper.appendChild(navDefProj);
+      navDefProj.textContent = project.projectName;
+      navDefProj.classList.add(
+        "navItem",
+        "proj" + project.projectId,
+        project.projectPrio
+      );
+
+      navDefProj.addEventListener("click", () => {
+        const bodyProjWrapper = document.querySelector(".projBodyWrapper");
+        this.GenerateProjectPanel(bodyProjWrapper, project);
+      });
+
+      navProjectPanelWrapper.appendChild(navDefProj);
+    }
   }
 
   DeleteNavPanelProj(projectName) {
@@ -126,62 +164,76 @@ export class DomController {
     const AddNewProjWrapper = document.createElement("div");
     AddNewProjWrapper.classList.add("projBodyWrapper");
     mainWrapper.appendChild(AddNewProjWrapper);
-    this.GenerateAddButton(AddNewProjWrapper);
+  }
+
+  GenerateTodayPanel(mainWrapper, projectStorage) {
+    if (!projectStorage) {
+      this.GenerateSplashPanel();
+    } else {
+      const today = new Date();
+      projectStorage.forEach((proj) => {
+        if (proj.projectTasks.length === 0) {
+        } else {
+          proj.projectTasks.forEach((task) => {
+            if (task.dueDate === today) {
+              const taskWrapper = document.createElement("div");
+              this.GenerateTaskPanel(taskWrapper, task);
+
+              projWrapper.appendChild(taskWrapper);
+            }
+          });
+          projWrapper.classList.add("hasTasks");
+        }
+      });
+    }
   }
 
   GenerateProjectPanel(Wrapper, Project) {
-    const projWrapper = document.createElement("div");
-    projWrapper.classList.add(Project.projectPrio, "projWrapper");
-    projWrapper.setAttribute("data-project-name", Project.projectName);
-    Project.DomElement = projWrapper;
-    // Add data attribute to identify the project
+    const projOpen = document.querySelector("projWrapper");
+    if (!projOpen) {
+      const projWrapper = document.createElement("div");
+      projWrapper.classList.add(Project.projectPrio, "projWrapper");
+      projWrapper.setAttribute("data-project-name", Project.projectName);
+      Project.DomElement = projWrapper;
+      // Add data attribute to identify the project
 
-    const projName = document.createElement("div");
-    projName.textContent = Project.projectName;
-    projName.classList.add("projName", "projItem");
-    projWrapper.appendChild(projName);
+      const projName = document.createElement("div");
+      projName.textContent = Project.projectName;
+      projName.classList.add("projName", "projItem");
+      projWrapper.appendChild(projName);
 
-    const projDate = document.createElement("div");
-    projDate.textContent =
-      "Due Date: " + Project.projectDue.toLocaleDateString();
-    projDate.classList.add("projDate", "projItem");
-    projWrapper.appendChild(projDate);
+      const projDate = document.createElement("div");
+      projDate.textContent =
+        "Due Date: " + Project.projectDue.toLocaleDateString();
+      projDate.classList.add("projDate", "projItem");
+      projWrapper.appendChild(projDate);
 
-    const projectDesc = document.createElement("div");
-    projectDesc.textContent = Project.projectDesc;
-    projectDesc.classList.add("projDesc", "projItem");
-    projWrapper.appendChild(projectDesc);
+      const projectDesc = document.createElement("div");
+      projectDesc.textContent = Project.projectDesc;
+      projectDesc.classList.add("projDesc", "projItem");
+      projWrapper.appendChild(projectDesc);
 
-    const projButtonWrapper = document.createElement("div");
+      const projButtonWrapper = document.createElement("div");
 
-    this.GenerateAddButton(projButtonWrapper, Project);
-    this.GenerateDeleteButton(projButtonWrapper);
+      this.GenerateAddButton(projButtonWrapper, Project);
+      this.GenerateDeleteButton(projWrapper);
 
-    projWrapper.appendChild(projButtonWrapper);
+      projWrapper.appendChild(projButtonWrapper);
 
-    if (Project.projectTasks.length === 0) {
-    } else {
-      Project.projectTasks.forEach((element) => {
-        const taskWrapper = document.createElement("div");
-        this.GenerateTaskPanel(taskWrapper, element);
+      if (Project.projectTasks.length === 0) {
+      } else {
+        Project.projectTasks.forEach((element) => {
+          const taskWrapper = document.createElement("div");
+          this.GenerateTaskPanel(taskWrapper, element);
 
-        projWrapper.appendChild(taskWrapper);
-      });
-      projWrapper.classList.add("hasTasks");
+          projWrapper.appendChild(taskWrapper);
+        });
+        projWrapper.classList.add("hasTasks");
+      }
+      this.AddNewNavPanelProj(Project);
+
+      Wrapper.appendChild(projWrapper);
     }
-    this.ModifyTaskHeight(projWrapper, Project);
-    this.AddNewNavPanelProj(Project);
-
-    Wrapper.appendChild(projWrapper);
-  }
-
-  ModifyTaskHeight(projWrapper, Project) {
-    const taskHeight = 100;
-    const numTasks = Project.projectTasks ? Project.projectTasks.length : 0;
-    const totalHeight = 100 + numTasks * taskHeight;
-
-    // Set the height of projWrapper
-    projWrapper.style.height = totalHeight + "px";
   }
 
   extractProjectInfo(projectWrapper) {
@@ -200,9 +252,6 @@ export class DomController {
 
     this.GenerateDeleteButton(Wrapper, task.taskPrio);
 
-    // const taskCircle = document.createElement("div");
-    // taskCircle.classList.add("taskCircle", task.taskPrio, "taskItem");
-
     const taskName = document.createElement("div");
     taskName.textContent = task.taskName;
     taskName.classList.add("taskName", "taskItem");
@@ -215,15 +264,11 @@ export class DomController {
     taskDesc.textContent = task.taskDesc;
     taskDesc.classList.add("taskDesc", "taskItem");
 
-    //Wrapper.appendChild(taskCircle);
     Wrapper.appendChild(taskName);
     Wrapper.appendChild(taskDate);
     Wrapper.appendChild(taskDesc);
   }
 
-  //is it possible to not have to import the task file to
-  //make new tasks here? Should taskModule.js handle this?
-  //but then it would have to import the dom module too, right?
   AddNewTask(name, description, dueDate, priority, project) {
     // Create a new Task object
     const newTask = new Task(name, description, dueDate, priority, project);
@@ -239,24 +284,18 @@ export class DomController {
     );
 
     //Check to see if we need to enlarge the project container
-    this.ModifyTaskHeight(projWrapper, project);
+    //this.ModifyTaskHeight(projWrapper, project);
 
     projWrapper.appendChild(taskWrapper);
-
-    //Check if we need to tag the projectWrapper to be enlarged
-    // const hasTasksClass = projWrapper.classList.contains("hasTasks");
-
-    // if (!hasTasksClass) {
-    //   projWrapper.classList.add("hasTasks");
-    // }
   }
 
-  AddNewProject(name, description, dueDate, priority) {
+  AddNewProject(id, name, description, dueDate, priority) {
     // Create a new proj object
-    const newProject = new Project(name, description, dueDate, priority);
-    const mainWrapper = document.querySelector(".projBodyWrapper");
+    const newProject = new Project(id, name, description, dueDate, priority);
+    this.storageHandler.saveToLocalStorage(newProject);
+    const projWrapper = document.querySelector(".projWrapper");
 
-    this.GenerateProjectPanel(mainWrapper, newProject);
+    this.GenerateProjectPanel(projWrapper, newProject);
   }
 
   GenerateDeleteButton(wrapper, taskPrio) {
@@ -266,6 +305,10 @@ export class DomController {
 
     if (taskPrio) {
       Delete.classList.add("taskCircle", taskPrio, "taskItem");
+      const deleteCheckMark = new Image();
+      deleteCheckMark.classList.add("taskCheckMark");
+      deleteCheckMark.src = Checkmark;
+      Delete.appendChild(deleteCheckMark);
     } else {
       Delete.classList.add("deleteBtn");
       Delete.textContent = " X ";
@@ -278,7 +321,6 @@ export class DomController {
     const Add = document.createElement("button");
     Add.classList.add("addBtn");
     Add.textContent = " + ";
-
     Add.addEventListener("click", () => this.GenerateAddForm(wrapper, project));
 
     wrapper.appendChild(Add);
@@ -302,73 +344,93 @@ export class DomController {
   //Generate a form that allows you to add a new project, or task
   //should have a submit button at the bottom, and a close button.
   GenerateAddForm(wrapper, project) {
-    const formWrapper = document.createElement("div");
+    const addFormOpen = document.querySelector(".formWrapper");
 
-    const headerWrapper = document.createElement("div");
+    if (!addFormOpen) {
+      const formWrapper = document.createElement("div");
+      formWrapper.classList.add("formWrapper");
 
-    const title = document.createElement("div");
-    title.textContent = "Add a new task or project";
-    headerWrapper.appendChild(title);
+      const formHeaderWrapper = document.createElement("div");
+      formHeaderWrapper.classList.add("formHeaderWrapper");
 
-    //could maybe do headerWrapper.appendChild(code below)?
-    this.GenerateDeleteButton(formWrapper);
+      // const title = document.createElement("div");
+      // title.textContent = "Add a new task or project";
+      // formHeaderWrapper.appendChild(title);
 
-    formWrapper.appendChild(headerWrapper);
+      this.GenerateDeleteButton(formWrapper);
 
-    const form = document.createElement("form");
+      formWrapper.appendChild(formHeaderWrapper);
 
-    const inputName = document.createElement("input");
-    inputName.setAttribute("type", "text");
-    inputName.setAttribute("name", "textInput");
-    inputName.setAttribute("placeholder", "Enter name");
-    form.appendChild(inputName);
+      const form = document.createElement("form");
 
-    const inputDesc = document.createElement("input");
-    inputDesc.setAttribute("type", "text");
-    inputDesc.setAttribute("desc", "textInput");
-    inputDesc.setAttribute("placeholder", "Enter description");
-    form.appendChild(inputDesc);
+      const inputName = document.createElement("input");
+      inputName.classList.add("addFormName");
+      inputName.setAttribute("type", "text");
+      inputName.setAttribute("name", "textInput");
+      inputName.setAttribute("placeholder", "Enter title of project or task");
+      form.appendChild(inputName);
 
-    const inputDate = document.createElement("input");
-    inputDate.setAttribute("type", "date");
-    inputDate.setAttribute("name", "dateInput");
-    form.appendChild(inputDate);
+      const inputDesc = document.createElement("input");
+      inputDesc.classList.add("addFormDesc");
+      inputDesc.setAttribute("type", "text");
+      inputDesc.setAttribute("desc", "textInput");
+      inputDesc.setAttribute("placeholder", "Enter description");
+      form.appendChild(inputDesc);
 
-    const inputPrio = document.createElement("select");
-    inputPrio.name = "priority";
-    const options = ["Critical", "Urgent", "Routine"];
+      const dateFormWrapper = document.createElement("div");
+      dateFormWrapper.classList.add("dateFormWrapper");
 
-    options.forEach((optionText) => {
-      const optionElement = document.createElement("option");
-      optionElement.textContent = optionText;
-      inputPrio.appendChild(optionElement);
-    });
-    form.appendChild(inputPrio);
+      const inputDate = document.createElement("input");
+      inputDate.classList.add("addFormDate");
+      inputDate.setAttribute("type", "date");
+      inputDate.setAttribute("name", "dateInput");
+      dateFormWrapper.appendChild(inputDate);
 
-    const submitButton = document.createElement("button");
-    submitButton.textContent = "Submit";
-    form.appendChild(submitButton);
+      const inputPrio = document.createElement("select");
+      inputPrio.classList.add("addFormPrio");
+      inputPrio.name = "priority";
+      const options = ["Critical", "Urgent", "Routine"];
 
-    form.addEventListener("submit", (event) => {
-      event.preventDefault();
+      options.forEach((optionText) => {
+        const optionElement = document.createElement("option");
+        optionElement.textContent = optionText;
+        inputPrio.appendChild(optionElement);
+      });
+      dateFormWrapper.appendChild(inputPrio);
+      form.appendChild(dateFormWrapper);
 
-      // Retrieve input values
-      const name = inputName.value;
-      const description = inputDesc.value;
-      const date = inputDate.value;
-      const priority = inputPrio.value;
+      const submitButton = document.createElement("button");
+      submitButton.textContent = "Submit";
+      form.appendChild(submitButton);
 
-      this.RemovePanel(formWrapper);
-      if (!project) {
-        this.AddNewProject(name, description, date, priority);
-      } else {
-        this.AddNewTask(name, description, date, priority, project);
-      }
-    });
+      form.addEventListener("submit", (event) => {
+        event.preventDefault();
 
-    formWrapper.appendChild(form);
+        // Retrieve input values
+        const name = inputName.value;
+        const description = inputDesc.value;
+        const date = inputDate.value;
+        const priority = inputPrio.value;
 
-    wrapper.appendChild(formWrapper);
+        this.RemovePanel(formWrapper);
+        if (!project) {
+          //Generate the project with a random ID number
+          this.AddNewProject(
+            Math.floor(Math.random() * 999999999),
+            name,
+            description,
+            date,
+            priority
+          );
+        } else {
+          this.AddNewTask(name, description, date, priority, project);
+        }
+      });
+
+      formWrapper.appendChild(form);
+
+      wrapper.appendChild(formWrapper);
+    }
   }
 
   GenerateOnEntry(defaultProj) {
