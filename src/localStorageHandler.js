@@ -4,18 +4,6 @@ import { Task } from "./taskModule.js";
 
 export class StorageHandler {
   // Function to save projects and tasks to local storage
-  //   projects = {
-  //   [id] : {
-  //      Name:
-  //      Desc:
-  //      Prio:
-  //   }
-  // }
-
-  // onSaveToLocal(id, project) {
-  //   projects = GetLocal()
-  //   local.setItem(‘projects’, JSON.stringify({…projects, { [id]: project })
-  // }
 
   saveToLocalStorage(project) {
     let projectsData = localStorage.getItem("projects");
@@ -28,20 +16,6 @@ export class StorageHandler {
     projectsData[project.projectId] = project;
 
     localStorage.setItem("projects", JSON.stringify(projectsData));
-
-    // projectsData.setItem(
-    //   "projects",
-    //   JSON.stringify(...projectsData, { [project.projectId]: project })
-    // );
-    // const projectsData = localStorage.getItem("projects");
-    // if (Array.isArray(projectsData)) {
-    //   localStorage.setItem("project", [
-    //     ...projectsData,
-    //     JSON.stringify(project),
-    //   ]);
-    // } else {
-    //   localStorage.setItem("project", JSON.stringify(project));
-    // }
   }
 
   // Function to retrieve projects and tasks from local storage
@@ -76,34 +50,21 @@ export class StorageHandler {
       }
     }
   }
-  // if (projectsData) {
-  //   const projects = JSON.parse(projectsData);
-  //   // Check if projects is an array
-  //   if (projects) {
-  //     return projects.forEach((project) => {
-  //       const tasks = project.tasks.forEach((taskData) => {
-  //         return new Task(
-  //           taskData.name,
-  //           taskData.description,
-  //           taskData.dueDate,
-  //           taskData.priority,
-  //           project
-  //         );
-  //       });
-  //       return new Project(
-  //         project.id,
-  //         project.name,
-  //         project.description,
-  //         project.dueDate,
-  //         project.priority,
-  //         tasks
-  //       );
-  //     });
-  //   } else {
-  //     console.error("Projects data in local storage doesn't exist");
-  //     return [];
-  //   }
-  // } else {
-  //   return [];
-  // }
+
+  removeProjectFromLocalStorage(projectId) {
+    // Retrieve projects data from local storage
+    let projectsData = localStorage.getItem("projects");
+
+    // If projects data exists
+    if (projectsData) {
+      // Parse JSON string into an object
+      projectsData = JSON.parse(projectsData);
+
+      // Remove project with the specified id from the object
+      delete projectsData[projectId];
+
+      // Update data in local storage
+      localStorage.setItem("projects", JSON.stringify(projectsData));
+    }
+  }
 }

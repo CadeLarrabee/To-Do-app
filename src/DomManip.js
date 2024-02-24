@@ -182,18 +182,17 @@ export class DomController {
               projWrapper.appendChild(taskWrapper);
             }
           });
-          projWrapper.classList.add("hasTasks");
         }
       });
     }
   }
 
   GenerateProjectPanel(Wrapper, Project) {
-    const projOpen = document.querySelector("projWrapper");
+    const projOpen = document.querySelector(".projWrapper");
     if (!projOpen) {
       const projWrapper = document.createElement("div");
-      projWrapper.classList.add(Project.projectPrio, "projWrapper");
-      projWrapper.setAttribute("data-project-name", Project.projectName);
+      projWrapper.classList.add("projWrapper");
+      projWrapper.setAttribute("data-project-id", Project.projectId);
       Project.DomElement = projWrapper;
       // Add data attribute to identify the project
 
@@ -228,7 +227,6 @@ export class DomController {
 
           projWrapper.appendChild(taskWrapper);
         });
-        projWrapper.classList.add("hasTasks");
       }
       this.AddNewNavPanelProj(Project);
 
@@ -236,13 +234,13 @@ export class DomController {
     }
   }
 
-  extractProjectInfo(projectWrapper) {
-    // Retrieve project name from the data attribute
-    const projectName = projectWrapper.getAttribute("data-project-name");
+  // extractProjectInfo(projectWrapper) {
+  //   // Retrieve project name from the data attribute
+  //   const projectName = projectWrapper.getAttribute("data-project-name");
 
-    // Find the Project instance associated with the project name
-    return projects.find((project) => project.name === projectName);
-  }
+  //   // Find the Project instance associated with the project name
+  //   return projects.find((project) => project.name === projectName);
+  // }
 
   GenerateTaskPanel(Wrapper, task) {
     //
@@ -280,7 +278,7 @@ export class DomController {
     // Append the task panel to the appropriate location in the DOM
     project.tasks.push(newTask);
     const projWrapper = document.querySelector(
-      `[data-project-name="${project.name}"]`
+      `[data-project-id="${project.id}"]`
     );
 
     //Check to see if we need to enlarge the project container
@@ -327,14 +325,14 @@ export class DomController {
   }
 
   // Remove a panel and all its children from the DOM
+  //This should be checking whats the closest proj/task panel and deleting down
   RemovePanel(panel) {
     if (!panel) return;
-
     if (panel.classList.contains("projWrapper")) {
       // Call the function to delete the corresponding navigation panel
-      this.DeleteNavPanelProj(panel.dataset.projectName);
+      this.DeleteNavPanelProj("proj" + panel.dataset.projectId);
+      this.storageHandler.removeProjectFromLocalStorage(panel.projectId);
     }
-
     while (panel.firstChild) {
       panel.removeChild(panel.firstChild);
     }
