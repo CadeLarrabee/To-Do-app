@@ -18,12 +18,14 @@ export class DomController {
     mainProjPanelWrapper.classList.add("mainWrapper");
     document.body.appendChild(mainProjPanelWrapper);
 
-    this.GenerateNavPanel(mainProjPanelWrapper);
+    const loadedProjs = this.storageHandler.loadFromLocalStorage();
+
+    this.GenerateNavPanel(mainProjPanelWrapper, loadedProjs);
     this.GenerateBodyPanel(mainProjPanelWrapper);
-    //this.GenerateTodayPanel(mainProjPanelWrapper, projectLocal);
+    this.GenerateTodayPanel(mainProjPanelWrapper, loadedProjs);
   }
 
-  GenerateNavPanel(mainWrapper) {
+  GenerateNavPanel(mainWrapper, loadedProjs) {
     //
     // Handle the generation of the nav panel and all its components.
     //
@@ -39,7 +41,7 @@ export class DomController {
     navPanelWrapper.appendChild(navPanelMainTitle);
 
     navPanelMainTitle.addEventListener("click", () =>
-      this.GenerateTodayPanel(mainWrapper)
+      this.GenerateTodayPanel(mainWrapper, loadedProjs)
     );
 
     const navPanelMainDate = document.createElement("div");
@@ -109,11 +111,10 @@ export class DomController {
 
     //Load the saved projects, and add them to the nav bar
 
-    this.LoadProjsToNavPanel();
+    this.LoadProjsToNavPanel(loadedProjs);
   }
 
-  LoadProjsToNavPanel() {
-    const loadedProjs = this.storageHandler.loadFromLocalStorage();
+  LoadProjsToNavPanel(loadedProjs) {
     if (loadedProjs) {
       loadedProjs.forEach((proj) => {
         this.AddNewNavPanelProj(proj);
@@ -167,9 +168,16 @@ export class DomController {
   }
 
   GenerateTodayPanel(mainWrapper, projectStorage) {
-    if (!projectStorage) {
-      this.GenerateSplashPanel();
-    } else {
+    if (!projectStorage || mainWrapper.querySelector(".todayWrapper")) {
+      //this.GenerateSplashPanel();
+    } 
+      else {
+        const projWrapper = mainWrapper.querySelector(".projWrapper");
+        if (projWrapper) {
+          this.RemovePanel(projWrapper);
+        }
+      const todayWrapper = document.createElement("div");
+      todayWrapper.classList.add("todayWrapper");
       const today = new Date();
       projectStorage.forEach((proj) => {
         if (proj.projectTasks.length === 0) {
@@ -179,22 +187,26 @@ export class DomController {
               const taskWrapper = document.createElement("div");
               this.GenerateTaskPanel(taskWrapper, task);
 
-              projWrapper.appendChild(taskWrapper);
+              todayWrapper.appendChild(taskWrapper);
             }
           });
         }
+        mainWrapper.appendChild(todayWrapper);
       });
     }
   }
 
   GenerateProjectPanel(Wrapper, Project) {
     const projOpen = document.querySelector(".projWrapper");
+    const todayWrapperOpen = document.querySelector(".todayWrapper");
+    if (todayWrapperOpen) {
+      this.RemovePanel(todayWrapperOpen);
+    }
     if (!projOpen) {
       const projWrapper = document.createElement("div");
       projWrapper.classList.add("projWrapper");
       projWrapper.setAttribute("data-project-id", Project.projectId);
       Project.DomElement = projWrapper;
-      // Add data attribute to identify the project
 
       const projName = document.createElement("div");
       projName.textContent = Project.projectName;
@@ -291,7 +303,7 @@ export class DomController {
     // Create a new proj object
     const newProject = new Project(id, name, description, dueDate, priority);
     this.storageHandler.saveToLocalStorage(newProject);
-    const projWrapper = document.querySelector(".projWrapper");
+    const projWrapper = document.querySelector(".projBodyWrapper");
 
     this.GenerateProjectPanel(projWrapper, newProject);
   }
@@ -331,7 +343,9 @@ export class DomController {
     if (panel.classList.contains("projWrapper")) {
       // Call the function to delete the corresponding navigation panel
       this.DeleteNavPanelProj("proj" + panel.dataset.projectId);
-      this.storageHandler.removeProjectFromLocalStorage(panel.projectId);
+      this.storageHandler.removeProjectFromLocalStorage(
+        panel.dataset.projectId
+      );
     }
     while (panel.firstChild) {
       panel.removeChild(panel.firstChild);
