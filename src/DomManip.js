@@ -44,12 +44,12 @@ export class DomController {
       this.GenerateTodayPanel(loadedProjs)
     );
 
-    const navPanelMainDate = document.createElement("div");
-    navPanelMainDate.classList.add("navDate", "navItem");
+    // const navPanelMainDate = document.createElement("div");
+    // navPanelMainDate.classList.add("navDate", "navItem");
 
-    const currentDate = new Date();
-    const formattedDate = format(currentDate, "yyyy-MM-dd");
-    navPanelMainDate.textContent = formattedDate;
+    // const currentDate = new Date();
+    // const formattedDate = format(currentDate, "yyyy-MM-dd");
+    // navPanelMainDate.textContent = formattedDate;
     navPanelMainTitle.appendChild(navPanelMainDate);
 
     //Project panels

@@ -36,19 +36,6 @@ export class StorageHandler {
     localStorage.setItem("projects", JSON.stringify(projectsData));
   }
 
-  //   saveToLocalStorage(project) {
-  //     let projectsData = localStorage.getItem("projects");
-  //     if (!projectsData) {
-  //       projectsData = {};
-  //     } else {
-  //       projectsData = JSON.parse(projectsData);
-  //     }
-
-  //     projectsData[project.projectId] = project;
-
-  //     localStorage.setItem("projects", JSON.stringify(projectsData));
-  //   }
-
   // Function to retrieve projects and tasks from local storage
   loadFromLocalStorage() {
     const projectsData = localStorage.getItem("projects");
@@ -60,7 +47,7 @@ export class StorageHandler {
             return new Task(
               taskData.name,
               taskData.description,
-              taskData.dueDate,
+              new Date(taskData.dueDate),
               taskData.priority,
               project
             );
@@ -69,7 +56,7 @@ export class StorageHandler {
             project.id,
             project.name,
             project.description,
-            project.dueDate,
+            new Date(project.dueDate),
             project.priority,
             tasks
           );
