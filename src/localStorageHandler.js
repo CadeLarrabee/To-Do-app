@@ -13,10 +13,41 @@ export class StorageHandler {
       projectsData = JSON.parse(projectsData);
     }
 
-    projectsData[project.projectId] = project;
+    // Serialize tasks before saving
+    const serializedTasks = project.tasks.map((task) => ({
+      name: task.name,
+      description: task.description,
+      dueDate: task.dueDate,
+      priority: task.priority,
+    }));
+
+    // Add serialized tasks to the project object
+    const serializedProject = {
+      id: project.id,
+      name: project.name,
+      description: project.description,
+      dueDate: project.dueDate,
+      priority: project.priority,
+      tasks: serializedTasks, // Save serialized tasks
+    };
+
+    projectsData[project.projectId] = serializedProject;
 
     localStorage.setItem("projects", JSON.stringify(projectsData));
   }
+
+  //   saveToLocalStorage(project) {
+  //     let projectsData = localStorage.getItem("projects");
+  //     if (!projectsData) {
+  //       projectsData = {};
+  //     } else {
+  //       projectsData = JSON.parse(projectsData);
+  //     }
+
+  //     projectsData[project.projectId] = project;
+
+  //     localStorage.setItem("projects", JSON.stringify(projectsData));
+  //   }
 
   // Function to retrieve projects and tasks from local storage
   loadFromLocalStorage() {

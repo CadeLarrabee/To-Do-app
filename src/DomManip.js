@@ -22,7 +22,7 @@ export class DomController {
 
     this.GenerateNavPanel(mainProjPanelWrapper, loadedProjs);
     this.GenerateBodyPanel(mainProjPanelWrapper);
-    this.GenerateTodayPanel(mainProjPanelWrapper, loadedProjs);
+    this.GenerateTodayPanel(loadedProjs);
   }
 
   GenerateNavPanel(mainWrapper, loadedProjs) {
@@ -41,7 +41,7 @@ export class DomController {
     navPanelWrapper.appendChild(navPanelMainTitle);
 
     navPanelMainTitle.addEventListener("click", () =>
-      this.GenerateTodayPanel(mainWrapper, loadedProjs)
+      this.GenerateTodayPanel(loadedProjs)
     );
 
     const navPanelMainDate = document.createElement("div");
@@ -167,32 +167,52 @@ export class DomController {
     mainWrapper.appendChild(AddNewProjWrapper);
   }
 
-  GenerateTodayPanel(mainWrapper, projectStorage) {
+  GenerateTodayPanel(projectStorage) {
+    const mainWrapper = document.querySelector(".projBodyWrapper");
     if (!projectStorage || mainWrapper.querySelector(".todayWrapper")) {
       //this.GenerateSplashPanel();
-    } 
-      else {
-        const projWrapper = mainWrapper.querySelector(".projWrapper");
-        if (projWrapper) {
-          this.RemovePanel(projWrapper);
-        }
+    } else {
+      const projWrapper = mainWrapper.querySelector(".projWrapper");
+      if (projWrapper) {
+        this.RemovePanel(projWrapper);
+      }
       const todayWrapper = document.createElement("div");
       todayWrapper.classList.add("todayWrapper");
       const today = new Date();
+      //
       projectStorage.forEach((proj) => {
-        if (proj.projectTasks.length === 0) {
-        } else {
-          proj.projectTasks.forEach((task) => {
-            if (task.dueDate === today) {
-              const taskWrapper = document.createElement("div");
-              this.GenerateTaskPanel(taskWrapper, task);
-
-              todayWrapper.appendChild(taskWrapper);
-            }
+        if (proj.projectTasks.length > 0) {
+          //
+          //Check if there are tasks due today
+          //
+          const tasksDueToday = proj.projectTasks.some((task) => {
+            return (
+              task.dueDate.getDate() === today.getDate() &&
+              task.dueDate.getMonth() === today.getMonth() &&
+              task.dueDate.getFullYear() === today.getFullYear()
+            );
           });
+          //Add a project header
+          if (tasksDueToday) {
+            const projName = document.createElement("div");
+            projName.textContent = proj.projectName;
+            projName.classList.add("projName", "projItem");
+            todayWrapper.appendChild(projName);
+            proj.projectTasks.forEach((task) => {
+              if (
+                task.dueDate.getDate() === today.getDate() &&
+                task.dueDate.getMonth() === today.getMonth() &&
+                task.dueDate.getFullYear() === today.getFullYear()
+              ) {
+                const taskWrapper = document.createElement("div");
+                this.GenerateTaskPanel(taskWrapper, task);
+                todayWrapper.appendChild(taskWrapper);
+              }
+            });
+          }
         }
-        mainWrapper.appendChild(todayWrapper);
       });
+      mainWrapper.appendChild(todayWrapper);
     }
   }
 
@@ -292,6 +312,8 @@ export class DomController {
     const projWrapper = document.querySelector(
       `[data-project-id="${project.id}"]`
     );
+
+    this.storageHandler.saveToLocalStorage(project);
 
     //Check to see if we need to enlarge the project container
     //this.ModifyTaskHeight(projWrapper, project);
