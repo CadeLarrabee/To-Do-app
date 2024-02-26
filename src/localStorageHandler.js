@@ -15,6 +15,7 @@ export class StorageHandler {
 
     // Serialize tasks before saving
     const serializedTasks = project.tasks.map((task) => ({
+      id: task.id,
       name: task.name,
       description: task.description,
       dueDate: task.dueDate,
@@ -45,6 +46,7 @@ export class StorageHandler {
         const projectObjects = Object.values(projects).map((project) => {
           const tasks = project.tasks.map((taskData) => {
             return new Task(
+              taskData.id,
               taskData.name,
               taskData.description,
               new Date(taskData.dueDate),

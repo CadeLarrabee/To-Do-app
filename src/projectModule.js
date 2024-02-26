@@ -7,7 +7,6 @@ export class Project {
     this.dueDate = new Date(dueDate);
     this.priority = priority;
     this.tasks = tasks ? tasks : [];
-    this.domElement = null;
   }
 
   displayDetails() {

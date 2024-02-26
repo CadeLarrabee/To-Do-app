@@ -37,7 +37,7 @@ export class DomController {
 
     const navPanelMainTitle = document.createElement("div");
     navPanelMainTitle.classList.add("navTitle", "navItem");
-    navPanelMainTitle.textContent = "Today:";
+    navPanelMainTitle.textContent = "Today";
     navPanelWrapper.appendChild(navPanelMainTitle);
 
     navPanelMainTitle.addEventListener("click", () =>
@@ -55,7 +55,10 @@ export class DomController {
     //Project panels
 
     const navNewProjectPanelWrapper = document.createElement("div");
-    navNewProjectPanelWrapper.classList.add("navNewProjectPanelWrapper");
+    navNewProjectPanelWrapper.classList.add(
+      "navNewProjectPanelWrapper",
+      "navItem"
+    );
     navNewProjectPanelWrapper.textContent = "Add New Project";
     //this.GenerateAddButton(navNewProjectPanelWrapper);
     navNewProjectPanelWrapper.addEventListener("click", () =>
@@ -205,7 +208,7 @@ export class DomController {
                 task.dueDate.getFullYear() === today.getFullYear()
               ) {
                 const taskWrapper = document.createElement("div");
-                this.GenerateTaskPanel(taskWrapper, task);
+                this.GenerateTaskPanel(taskWrapper, task, true);
                 todayWrapper.appendChild(taskWrapper);
               }
             });
@@ -226,7 +229,6 @@ export class DomController {
       const projWrapper = document.createElement("div");
       projWrapper.classList.add("projWrapper");
       projWrapper.setAttribute("data-project-id", Project.projectId);
-      Project.DomElement = projWrapper;
 
       const projName = document.createElement("div");
       projName.textContent = Project.projectName;
@@ -274,13 +276,14 @@ export class DomController {
   //   return projects.find((project) => project.name === projectName);
   // }
 
-  GenerateTaskPanel(Wrapper, task) {
+  GenerateTaskPanel(Wrapper, task, todayPanelFlag = false) {
     //
     //Given a task and a wrapper, generate a panel that handles info about the task.
     //
     Wrapper.classList.add("taskWrapper");
 
-    this.GenerateDeleteButton(Wrapper, task.taskPrio, true);
+    if (!todayPanelFlag)
+      this.GenerateDeleteButton(Wrapper, task.taskPrio, true);
 
     const taskName = document.createElement("div");
     taskName.textContent = task.taskName;
@@ -337,7 +340,7 @@ export class DomController {
       this.RemovePanel(wrapper, deleteDataFlag)
     );
 
-    if (taskPrio) {
+    if (taskPrio !== undefined && taskPrio !== null) {
       Delete.classList.add("taskCircle", taskPrio, "taskItem");
       const deleteCheckMark = new Image();
       deleteCheckMark.classList.add("taskCheckMark");
