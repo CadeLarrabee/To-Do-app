@@ -50,7 +50,7 @@ export class DomController {
     // const currentDate = new Date();
     // const formattedDate = format(currentDate, "yyyy-MM-dd");
     // navPanelMainDate.textContent = formattedDate;
-    navPanelMainTitle.appendChild(navPanelMainDate);
+    //navPanelMainTitle.appendChild(navPanelMainDate);
 
     //Project panels
 
@@ -247,7 +247,7 @@ export class DomController {
       const projButtonWrapper = document.createElement("div");
 
       this.GenerateAddButton(projButtonWrapper, Project);
-      this.GenerateDeleteButton(projWrapper);
+      this.GenerateDeleteButton(projWrapper, undefined, true);
 
       projWrapper.appendChild(projButtonWrapper);
 
@@ -280,7 +280,7 @@ export class DomController {
     //
     Wrapper.classList.add("taskWrapper");
 
-    this.GenerateDeleteButton(Wrapper, task.taskPrio);
+    this.GenerateDeleteButton(Wrapper, task.taskPrio, true);
 
     const taskName = document.createElement("div");
     taskName.textContent = task.taskName;
@@ -299,9 +299,9 @@ export class DomController {
     Wrapper.appendChild(taskDesc);
   }
 
-  AddNewTask(name, description, dueDate, priority, project) {
+  AddNewTask(id, name, description, dueDate, priority, project) {
     // Create a new Task object
-    const newTask = new Task(name, description, dueDate, priority, project);
+    const newTask = new Task(id, name, description, dueDate, priority, project);
 
     // Generate a new task panel for the new task
     const taskWrapper = document.createElement("div");
@@ -330,10 +330,12 @@ export class DomController {
     this.GenerateProjectPanel(projWrapper, newProject);
   }
 
-  GenerateDeleteButton(wrapper, taskPrio) {
+  GenerateDeleteButton(wrapper, taskPrio, deleteDataFlag = false) {
     const Delete = document.createElement("button");
 
-    Delete.addEventListener("click", () => this.RemovePanel(wrapper));
+    Delete.addEventListener("click", () =>
+      this.RemovePanel(wrapper, deleteDataFlag)
+    );
 
     if (taskPrio) {
       Delete.classList.add("taskCircle", taskPrio, "taskItem");
@@ -360,19 +362,22 @@ export class DomController {
 
   // Remove a panel and all its children from the DOM
   //This should be checking whats the closest proj/task panel and deleting down
-  RemovePanel(panel) {
+  RemovePanel(panel, deleteDataFlag = false) {
     if (!panel) return;
     if (panel.classList.contains("projWrapper")) {
       // Call the function to delete the corresponding navigation panel
       this.DeleteNavPanelProj("proj" + panel.dataset.projectId);
-      this.storageHandler.removeProjectFromLocalStorage(
-        panel.dataset.projectId
-      );
     }
     while (panel.firstChild) {
       panel.removeChild(panel.firstChild);
     }
+
     panel.parentNode.removeChild(panel);
+
+    if (deleteDataFlag)
+      this.storageHandler.removeProjectFromLocalStorage(
+        panel.dataset.projectId
+      );
   }
 
   //Generate a form that allows you to add a new project, or task
@@ -457,7 +462,14 @@ export class DomController {
             priority
           );
         } else {
-          this.AddNewTask(name, description, date, priority, project);
+          this.AddNewTask(
+            Math.floor(Math.random() * 999999999),
+            name,
+            description,
+            date,
+            priority,
+            project
+          );
         }
       });
 

@@ -73,13 +73,31 @@ export class StorageHandler {
     // Retrieve projects data from local storage
     let projectsData = localStorage.getItem("projects");
 
-    // If projects data exists
     if (projectsData) {
-      // Parse JSON string into an object
+      // parse the json data so we have real data
+      projectsData = JSON.parse(projectsData);
+
+      delete projectsData[projectId];
+
+      // Update data in local storage
+      localStorage.setItem("projects", JSON.stringify(projectsData));
+    }
+  }
+
+  removeTaskFromLocalStorage(taskId) {
+    let projectsData = localStorage.getItem("projects");
+    if (projectsData) {
       projectsData = JSON.parse(projectsData);
 
       // Remove project with the specified id from the object
-      delete projectsData[projectId];
+      const taskIndex = project.tasks.findIndex(
+        (task) => task.taskId === taskId
+      );
+      //index returns -1 if not found
+      if (taskIndex !== -1) {
+        //remove using splice because we don't want orphan our tasks
+        tasks.splice(taskIndex, 1);
+      }
 
       // Update data in local storage
       localStorage.setItem("projects", JSON.stringify(projectsData));

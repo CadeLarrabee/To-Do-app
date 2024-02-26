@@ -1,9 +1,10 @@
 import { parse } from "date-fns";
 export class Task {
-  constructor(name, description, dueDate, priority, project) {
+  constructor(id, name, description, dueDate, priority, project) {
+    this.id = id;
     this.name = name;
     this.description = description;
-    this.dueDate = dueDate;
+    this.dueDate = new Date(dueDate);
     this.priority = priority;
     this.project = project;
     this.domElement = null;
@@ -41,7 +42,7 @@ export class Task {
     this.description = newDesc;
   }
   set taskDue(newDate) {
-    this.dueDate = newDate;
+    this.dueDate = new Date(newDate);
   }
   set taskPrio(newPrio) {
     this.priority = newPrio;

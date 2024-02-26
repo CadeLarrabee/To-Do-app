@@ -4,7 +4,7 @@ export class Project {
     this.id = id;
     this.name = name;
     this.description = description;
-    this.dueDate = dueDate;
+    this.dueDate = new Date(dueDate);
     this.priority = priority;
     this.tasks = tasks ? tasks : [];
     this.domElement = null;
@@ -55,7 +55,7 @@ export class Project {
   }
 
   set projectDue(newDate) {
-    this.dueDate = newDate;
+    this.dueDate = new Date(newDate);
   }
 
   set projectPrio(newPrio) {
